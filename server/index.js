@@ -3,7 +3,6 @@ const app = express();
 
 const session = require("express-session");
 const passport = require("passport");
-const SpotifyStrategy = require("passport-spotify").Strategy;
 
 const redis = require("redis");
 const redisClient = redis.createClient({
@@ -39,25 +38,13 @@ const CLIENT_HOME_PAGE =
 redisClient.on("error", (err) => console.log(`Redis error: ${err}`));
 redisClient.on("ready", () => console.log("Redis connection established."));
 
-//Set up passport-spotify
-passport.use(
-  new SpotifyStrategy(
-    {
-      clientID: CLIENT_ID,
-      clientSecret: CLIENT_SECRET,
-      callbackURL: CALLBACK_URL,
-    },
-    async (accessToken, refreshToken, expires_in, profile, done) => {
-      const spotifyId = profile.id;
-      const name = profile.displayName;
-      // const email = profile?.emails[0]?.value;
+//Set up passport cookie serial/deserialization
+passport.serializeUser((user, done) => done(null, user));
+passport.deserializeUser((obj, done) => done(null, obj));
 
-      const user = { spotifyId, name, accessToken, refreshToken, expires_in };
-
-      return done(null, user);
-    }
-  )
-);
+//Initialize passport with session middileware
+app.use(passport.initialize());
+app.use(passport.session());
 
 //Create session object with cookie
 app.use(
@@ -76,7 +63,7 @@ app.use(
 );
 
 const authCheck = (req, res, next) => {
-  if (!req.session.userName) {
+  if (!req.session.passport?.user?.spotifyId) {
     res.status(401).json({
       authenticated: false,
       message: "User has not been authenticated.",
@@ -86,27 +73,21 @@ const authCheck = (req, res, next) => {
   }
 };
 
+//ROUTES
+app.use("/auth", require("./routes/auth_routes"));
+
 app.get("/", authCheck, (req, res) => {
-  res.send("Hello World!");
+  res.status(200).json({
+    authenticated: true,
+    message: "User successfully authenticated.",
+    user: req.session.passport.user.name,
+    cookies: req.cookies,
+  });
 });
 
 app.get("/ping", (req, res) => {
   res.send("PONG DONG");
   console.log("PONG");
-});
-
-app.get("/auth/spotify", passport.authenticate("spotify"));
-
-app.get(
-  "/auth/spotify/callback",
-  passport.authenticate("spotify", { failureRedirect: "/login" }),
-  (req, res) => {
-    console.log(req.user);
-  }
-);
-
-app.get("/login", (req, res) => {
-  res.send("Please log in.");
 });
 
 app.listen(SERVER_PORT, () => {
