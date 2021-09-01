@@ -1,7 +1,5 @@
 # Clean up your spotify playlists
 
----
-
 A simple app for flagging songs within a spotify playlist that contain user defined "blacklist" words.
 
 ## The idea
@@ -11,3 +9,10 @@ A simple app for flagging songs within a spotify playlist that contain user defi
 - Server gets each song and lyrics from Genius api
 - Server filters through the lyrics against the "blacklist" words
 - Server sends flagged songs to client to be rendered
+
+## Technologies
+
+- NextJS front-end
+- Sass for styling
+- Node with Express back-end
+- Passport.js for Spotify authentication

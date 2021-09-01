@@ -1,10 +1,13 @@
 # dependencies
 /node_modules
+/server/node_modules
+/client/node_modules
 /.pnp
 .pnp.js
 .eslintcache
 
 # local env files
+/server/.env
 .env.local
 .env.development.local
 .env.test.local
