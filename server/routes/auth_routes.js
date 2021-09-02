@@ -32,7 +32,10 @@ passport.use(
   )
 );
 
-router.get("/spotify", passport.authenticate("spotify"));
+router.get(
+  "/spotify",
+  passport.authenticate("spotify", { scope: ["user-read-private"] })
+);
 
 router.get(
   "/spotify/callback",

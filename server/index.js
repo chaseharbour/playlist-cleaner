@@ -75,6 +75,7 @@ const authCheck = (req, res, next) => {
 
 //ROUTES
 app.use("/auth", require("./routes/auth_routes"));
+app.use("/api", require("./routes/api_routes"));
 
 app.get("/", authCheck, (req, res) => {
   res.status(200).json({
