@@ -22,11 +22,12 @@ services:
     networks:
       - internal
     ports:
-      - "8080:${SERVER_PORT}"
+      - "8000:${SERVER_PORT}"
     env_file:
       - .env
     depends_on:
-      - db
+      - postgres
+      - redis
     restart: always
     healthcheck:
       test:
@@ -40,7 +41,7 @@ services:
       timeout: 10s
       retries: 3
       start_period: 10s
-  db:
+  redis:
     image: redis:latest
     container_name: redis-server
     networks:
@@ -52,3 +53,24 @@ services:
       timeout: 3s
       retries: 3
       start_period: 1s
+  postgres:
+    image: postgres:latest
+    restart: always
+    volumes:
+      - "./data/db:/var/lib/postgresql/data"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: pass
+      POSTGRES_NAME: postgres
+      POSTGRES_DB: db
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - "8080:8080"
