@@ -1,9 +1,11 @@
 version: "3.8"
 networks:
-  internal:
+  default:
+    name: spotify
 
 services:
   web:
+    container_name: web
     build:
       context: .
       args:
@@ -15,12 +17,12 @@ services:
         - CLIENT_ID=${CLIENT_ID}
         - CLIENT_SECRET=${CLIENT_SECRET}
         - SESS_SECRET=${SESS_SECRET}
-    container_name: saveddit-server
+
     volumes:
       - .:/usr/app
     command: npm run dev
     networks:
-      - internal
+      - default
     ports:
       - "8000:${SERVER_PORT}"
     env_file:
@@ -43,9 +45,7 @@ services:
       start_period: 10s
   redis:
     image: redis:latest
-    container_name: redis-server
-    networks:
-      - internal
+    container_name: redis
     restart: always
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
@@ -55,9 +55,10 @@ services:
       start_period: 1s
   postgres:
     image: postgres:latest
+    container_name: pg
     restart: always
-    volumes:
-      - "./data/db:/var/lib/postgresql/data"
+    expose:
+      - 5432
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: pass
@@ -71,6 +72,7 @@ services:
 
   adminer:
     image: adminer
+    container_name: adminer
     restart: always
     ports:
       - "8080:8080"
