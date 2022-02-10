@@ -57,13 +57,14 @@ services:
     image: postgres:latest
     container_name: pg
     restart: always
-    expose:
-      - 5432
+    ports:
+      - "15432:5432"
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: pass
-      POSTGRES_NAME: postgres
       POSTGRES_DB: db
+    volumes:
+      - /data/db:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s

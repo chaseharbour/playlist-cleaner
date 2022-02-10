@@ -3,10 +3,16 @@
  * @returns { Promise<void> }
  */
 exports.up = function (knex) {
-  return knex.schema.createTable("users", (table) => {
+  return knex.schema.createTable("playlists", (table) => {
     table.increments();
-    table.string("username");
+    table
+      .integer("user_id")
+      .notNullable()
+      .references("id")
+      .inTable("users")
+      .onDelete("cascade");
     table.string("spotifyId");
+    table.string("name");
   });
 };
 
@@ -15,5 +21,5 @@ exports.up = function (knex) {
  * @returns { Promise<void> }
  */
 exports.down = function (knex) {
-  return knex.schema.dropTable("users");
+  return knex.schema.dropTable("playlists");
 };

@@ -6,7 +6,13 @@
 module.exports = {
   development: {
     client: "pg",
-    connection: "postgresql://postgres:pass@pg:5432/db",
+    connection: {
+      host: "pg",
+      port: 5432,
+      database: "db",
+      user: "postgres",
+      password: "pass",
+    },
   },
 
   staging: {
