@@ -4,10 +4,13 @@ module.exports = {
   getAll(table) {
     return knex(table);
   },
+  getOne(table, id) {
+    return knex(table).where("id", id).first();
+  },
   async findOrCreateUser(username, spotifyId) {
     try {
       const res = await knex
-        .select("spotifyId")
+        .select("id", "spotifyId")
         .from("users")
         .where("spotifyId", spotifyId)
         .then((userList) => {
@@ -21,7 +24,7 @@ module.exports = {
               });
           }
           console.log("User already exists");
-          return userList[0].spotifyId;
+          return userList[0];
         });
 
       return res;
@@ -31,44 +34,41 @@ module.exports = {
       process.exit(1);
     }
   },
-  async addPlaylist(id, spotifyId, name, description, ownerId, ownerName) {
+  async addPlaylist(user_id, spotifyId, name, description, ownerId, ownerName) {
     try {
       const res = await knex
-        .select("id")
-        .from("users")
-        .where("id", id)
-        .then((userList) => {
-          if (userList > 0) {
-            knex
-              .select("spotifyId")
-              .from("playlists")
-              .where("spotifyId", spotifyId)
-              .then((playlist) => {
-                if (playlist.length === 0) {
-                  return knex("playlists")
-                    .returning([
-                      "spotifyId",
-                      "name",
-                      "description",
-                      "ownerId",
-                      "ownerName",
-                    ])
-                    .insert({
-                      spotifyId,
-                      name,
-                      description,
-                      ownerId,
-                      ownerName,
-                    })
-                    .then((playlists) => {
-                      console.log(playlists);
-                      return playlists;
-                    });
-                }
+        .select("spotifyId")
+        .from("playlists")
+        .where("spotifyId", spotifyId)
+        .then((playlist) => {
+          if (playlist.length === 0) {
+            return knex("playlists")
+              .returning([
+                "user_id",
+                "spotifyId",
+                "name",
+                "description",
+                "ownerId",
+                "ownerName",
+              ])
+              .insert({
+                user_id,
+                spotifyId,
+                name,
+                description,
+                ownerId,
+                ownerName,
+              })
+              .then((playlists) => {
+                console.log(playlists);
+                return playlists;
               });
           }
-          return userList;
+
+          console.log(`Playlist already added ${playlist}`);
+          return playlist;
         });
+
       return res;
     } catch (err) {
       console.log("Something went wrong.");

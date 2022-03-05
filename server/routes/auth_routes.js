@@ -58,6 +58,7 @@ router.get(
     );
 
     console.log(response);
+    req.session.user_id = response.id;
     res.redirect("/");
   }
 );
