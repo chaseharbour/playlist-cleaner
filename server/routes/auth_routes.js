@@ -2,6 +2,8 @@ const router = require("express").Router();
 const passport = require("passport");
 const SpotifyStrategy = require("passport-spotify").Strategy;
 
+const queries = require("../db/dbqueries");
+
 const {
   CLIENT_ID,
   CLIENT_SECRET,
@@ -23,6 +25,7 @@ passport.use(
     async (accessToken, refreshToken, expires_in, profile, done) => {
       const spotifyId = profile.id;
       const name = profile.displayName;
+      // console.log(profile);
       // const email = profile?.emails[0]?.value;
 
       const user = { spotifyId, name, accessToken, refreshToken, expires_in };
@@ -34,15 +37,27 @@ passport.use(
 
 router.get(
   "/spotify",
-  passport.authenticate("spotify", { scope: ["user-read-private"] })
+  passport.authenticate("spotify", {
+    scope: [
+      "user-read-private",
+      "playlist-read-private",
+      "playlist-modify-private",
+      "playlist-modify-public",
+      "playlist-read-collaborative",
+    ],
+  })
 );
 
 router.get(
   "/spotify/callback",
   passport.authenticate("spotify", { failureRedirect: "/login" }),
-  (req, res) => {
-    // console.log(req.user);
-    // console.log(req.session);
+  async (req, res) => {
+    const response = await queries.findOrCreateUser(
+      req.user.name,
+      req.user.spotifyId
+    );
+
+    console.log(response);
     res.redirect("/");
   }
 );

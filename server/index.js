@@ -76,6 +76,7 @@ const authCheck = (req, res, next) => {
 //ROUTES
 app.use("/auth", require("./routes/auth_routes"));
 app.use("/api", require("./routes/api_routes"));
+app.use("/user", require("./routes/user_routes"));
 
 app.get("/", authCheck, (req, res) => {
   res.status(200).json({
@@ -92,5 +93,5 @@ app.get("/ping", (req, res) => {
 });
 
 app.listen(SERVER_PORT, () => {
-  console.log(`Example app listening at ${SERVER_ADDRESS}`);
+  console.log(`App listening at ${SERVER_ADDRESS}`);
 });

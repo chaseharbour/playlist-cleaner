@@ -19,8 +19,18 @@ const getSpotifyPlaylists = async (req, res, next) => {
         },
       }
     );
-    console.log(response);
-    return res.json(response.data.items.map((p) => p));
+
+    const data = response.data.items.map((p) => {
+      return {
+        id: p.id,
+        name: p.name,
+        description: p.description,
+        ownerId: p.owner.id,
+        ownerName: p.owner.display_name,
+      };
+    });
+
+    return res.json(data);
   } catch (err) {
     console.error(err);
   }
