@@ -11,8 +11,8 @@ exports.up = function (knex) {
       .references("id")
       .inTable("users")
       .onDelete("cascade");
-    table.string("spotifyId");
-    table.string("name");
+    table.string("playlist_spotifyId");
+    table.string("playlist_name");
     table.string("description");
     table.string("ownerId");
     table.string("ownerName");

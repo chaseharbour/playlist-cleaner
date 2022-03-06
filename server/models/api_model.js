@@ -1,50 +1,6 @@
 const knex = require("./knex");
 
 module.exports = {
-  getAll(table) {
-    return knex(table);
-  },
-  getOne(table, id) {
-    return knex(table).where("id", id).first();
-  },
-  getOneSpotifyId(table, type, id) {
-    return knex(table).where(`${type}_spotifyId`, id).first();
-  },
-  async join(tableA, tableB, targetA, targetB) {
-    return await knex(tableA).join(
-      tableB,
-      `${tableA}.${targetA}`,
-      "=",
-      `${tableB}.${targetB}`
-    );
-  },
-  async findOrCreateUser(username, spotifyId) {
-    try {
-      const res = await knex
-        .select("id", "user_spotifyId")
-        .from("users")
-        .where("user_spotifyId", spotifyId)
-        .then((userList) => {
-          if (userList.length === 0) {
-            return knex("users")
-              .returning(["username", "user_spotifyId"])
-              .insert({ username, user_spotifyId: spotifyId })
-              .then((newUser) => {
-                console.log(`Inserted new user: ${newUser[0].user_spotifyId}`);
-                return newUser;
-              });
-          }
-          console.log("User already exists");
-          return userList[0];
-        });
-
-      return res;
-    } catch (err) {
-      console.log("Something went wrong.");
-      console.error(err);
-      process.exit(1);
-    }
-  },
   async addPlaylist(user_id, spotifyId, name, description, ownerId, ownerName) {
     try {
       const res = await knex

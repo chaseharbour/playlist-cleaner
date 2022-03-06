@@ -17,8 +17,9 @@ exports.up = function (knex) {
       .references("id")
       .inTable("playlists")
       .onDelete("cascade");
-    table.string("spotifyId");
-    table.string("name");
+    table.string("track_spotifyId");
+    table.string("track_name");
+    table.json("artists");
   });
 };
 

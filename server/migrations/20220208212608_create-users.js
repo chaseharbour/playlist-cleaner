@@ -6,7 +6,7 @@ exports.up = function (knex) {
   return knex.schema.createTable("users", (table) => {
     table.increments();
     table.string("username");
-    table.string("spotifyId");
+    table.string("user_spotifyId");
   });
 };
 
